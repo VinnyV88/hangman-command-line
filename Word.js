@@ -13,6 +13,10 @@ function Word(word){
   };
 
 };
+  this.letterIsMiss = function(ltr) {
+    return (this.word.indexOf(ltr) === -1)
+  };
+
 
   this.displayWord = function() {
     var maskedString = "";
