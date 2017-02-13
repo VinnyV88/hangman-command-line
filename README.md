@@ -3,7 +3,7 @@
 ## Synopsis:
 A hangman game that randomly chooses a word or phrase related to AMC's TV series Breaking Bad.  This is strictly a back-end program, so no HTML or CSS was used, the game is played entirely in the terminal. 
 
-<a href="https://media.giphy.com/media/3o6Yga5Kc2h1OiAw00/source.gif" target="_blank"><img src="http://i.giphy.com/3o6Yga5Kc2h1OiAw00.gif ></a>
+<a href="https://media.giphy.com/media/3o6Yga5Kc2h1OiAw00/source.gif" target="_blank"><img src="http://i.giphy.com/3o6Yga5Kc2h1OiAw00.gif" ></a>
 <a href="https://media.giphy.com/media/26gIOx95aYE1fc3ao/source.gif" target="_blank"><img src="http://i.giphy.com/26gIOx95aYE1fc3ao.gif" ></a>
 
 ## Screenshots
