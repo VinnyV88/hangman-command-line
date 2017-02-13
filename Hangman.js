@@ -1,75 +1,227 @@
-var wordObj = {};
+var inquirer = require('inquirer');
+var chalk = require('chalk');
+var figlet = require('figlet');
+var Word = require('./Word');
 
-	var hangman = {
-		wins: 0,
-		losses: 0,
-		guesses: 8,
-		userGuess: " ",
-		hits: 0,
-		hitSounds: ["hit_goddamnright.mp3", "hit_teartomyeye.mp3", "hit_tioding.mp3"],
-		missSounds: ["miss_bupkiss.mp3", "miss_getyourshittogether.mp3", "miss_gooseegg.mp3", "miss_jesuschrist.mp3", "miss_nodice.mp3", "miss_tiodingding.mp3"],
-		losePic: ["gus_dead.gif", "dead01.jpg", "end.jpg", "felina.png", "breakingbad_dead.jpg", "knocks.jpg", "tio_ding.jpg"],
-		loseSound: ["better_call_saul.mp3", "fringlittlerata.mp3", "gus_is_dead.mp3", "iamthedanger.mp3", "knocks.mp3"],
-		playSound: " ",
-		playAll: true,
-		muteEffects: false,
-		muteAll: false,
-		mute: "",
-		hit: false,
-		miss: false,
-		repeat: false,
-		invKey: false,
-		winner: false,
-		gameover: false,
-		lettersGuessed: [],
-		message: " ",
-		instruct: " ",
-		stsimg: " ",
-		word: " ",
-		statusHTML: " ",
-		status_imgHTML: " ",
-		wordsHTML: " ",
-		hangmanHTML: " ",
-		maskedString: " ",
-		owords:[gustavo = {oword: "gustavo fring", wpic: "gus_kingpin.png", wsound: "fringkillfamily.mp3"},
-			    meth = {oword: "crystal meth", wpic: "yeah_bitch.gif", wsound: "yeahscience.mp3"},
-			    cranston = {oword: "bryan cranston", wpic: "Bryan_Cranston.jpg", wsound: "empirebiz.mp3"},
-			    teacher = {oword: "chemistry teacher", wpic: "yeah_bitch.gif", wsound: "yeahscience.mp3"},
-			    walter = {oword: "walter white", wpic: "walter_white.jpg", wsound: "iamthedanger.mp3"},
-			    lydia = {oword: "lydia", wpic: "Iwin.jpg", wsound: "Iwon.mp3"},
-			    albuquereque = {oword: "albuquereque", wpic: "Iwin.jpg", wsound: "Iwon.mp3"},
-			    flynn = {oword: "flynn", wpic: "Iwin.jpg", wsound: "Iwon.mp3"},
-			    cancer = {oword: "cancer", wpic: "cancer.jpg", wsound: "notindanger.mp3"},
-			    lawyer = {oword: "lawyer", wpic: "lawyer.jpg", wsound: "bettercallsaullaugh.mp3"},
-			    hank = {oword: "hank", wpic: "hank.jpg", wsound: "treadlightly.mp3"},
-			    heisenberg = {oword: "heisenberg", wpic: "heisenberg.jpg", wsound: "heisenberg.mp3"},
-			    pinkman = {oword: "jesse pinkman", wpic: "yeah_bitch.gif", wsound: "yeahmagents.mp3"},
-			    saul = {oword: "saul goodman", wpic: "saul.jpg", wsound: "nodealnodice.mp3"},
-			    skyler = {oword: "skyler", wpic: "skyler_cash.jpg", wsound: "dirtysaul.mp3"},
-			    ricin = {oword: "ricin", wpic: "ricin.png", wsound: "noIknock.mp3"},
-			    tio = {oword: "tio salamanca", wpic: "tio.jpg", wsound: "ding.mp3"},
-			    tuco = {oword: "tuco salamanca", wpic: "tuco_tight.gif", wsound: "tucotight.mp3"},
-			    pollos = {oword: "los pollos hermanos", wpic: "lospollos.gif", wsound: "gus_is_dead.mp3"},
-			    mike = {oword: "mike ehrmantraut", wpic: "mike.jpg", wsound: "mike.mp3"}
-				],
-		//look into using an array of word objects instead of just words. a word object can have it's own personalized win/loss images and sounds
-		// words: ["gustavo", "fring", "lydia", "albuquereque", "tuco", "flynn", "chemistry", "teacher", 
-		// 		"cancer", "crystal", "lawyer", "hank", "heisenberg", "walter", "white", "meth",
-		// 		"cranston", "pinkman", "saul", "goodman", "skyler", "ehrmantraut", "ricin", "salamanca"],
+var gameWord;
 
-		initial: function() {
-			this.chooseRandomWord()
-			this.formatWord()
-			this.message = "Welcome to Hangman: Breaking Bad Edition!"
-			this.instruct = "Press any letter to start..."
-			this.hit = false
-			this.miss = false
-		},
+function Hangman() {
+	this.wins = 0;
+	this.losses = 0;
+	this.guesses = 8;
+	this.userGuess = " ";
+	this.repeat = false;
+	this.invKey = false;
+	this.message = " ";
+	this.words = ["gustavo fring", "crystal meth",	"bryan cranston",	"chemistry teacher", "walter white",	
+          "lydia", "albuquereque", "flynn",	"cancer",	"lawyer",	"hank",	"heisenberg",	"jesse pinkman",	
+          "saul goodman",	"skyler",	"ricin", "tio salamanca",	"tuco salamanca",	"los pollos hermanos",	
+          "mike ehrmantraut"];
+	this.asciiArt = [
+		" ═══╦══╦═╗\n    ║  ╚═╣\n         ║\n         ║\n         ║\n         ║\n         ║\n         ║\n      ▓▓▓▓▓▓▓",
+		" ═══╦══╦═╗\n    ║  ╚═╣\n    Ô    ║\n         ║\n         ║\n         ║\n         ║\n         ║\n      ▓▓▓▓▓▓▓",
+		" ═══╦══╦═╗\n    ║  ╚═╣\n    Ô    ║\n    |    ║\n         ║\n         ║\n         ║\n         ║\n      ▓▓▓▓▓▓▓",
+		" ═══╦══╦═╗\n    ║  ╚═╣\n    Ô    ║\n   \\|    ║\n         ║\n         ║\n         ║\n         ║\n      ▓▓▓▓▓▓▓",
+		" ═══╦══╦═╗\n    ║  ╚═╣\n    Ô    ║\n   \\|/   ║\n         ║\n         ║\n         ║\n         ║\n      ▓▓▓▓▓▓▓",
+		" ═══╦══╦═╗\n    ║  ╚═╣\n    Ô    ║\n   \\|/   ║\n    |    ║\n         ║\n         ║\n         ║\n      ▓▓▓▓▓▓▓",
+		" ═══╦══╦═╗\n    ║  ╚═╣\n    Ô    ║\n   \\|/   ║\n    |    ║\n   /     ║\n         ║\n         ║\n      ▓▓▓▓▓▓▓",
+		" ═══╦══╦═╗\n    ║  ╚═╣\n    Ø    ║\n   /|\\   ║\n    |    ║\n   / \\   ║\n         ║\n         ║\n      ▓▓▓▓▓▓▓"
+	];
 
-		chooseRandomWord: function() {
-			 
-			wordObj = this.owords[Math.floor(Math.random() * this.owords.length)]
+  this.chooseRandomWord = function() {
+    
+  return this.words[Math.floor(Math.random() * this.words.length)];
 
-			this.word = wordObj.oword
+  },
+
+	this.startGame = function(){
+		var _this = this;
+		this.message = " ";
+		this.initial();
+		this.displayGameStatus(this);
+		setTimeout(function() {
+			_this.guessPrompt(_this);
+		}, 1 * 1000);
+
+	};
+
+	this.displayHeader = function() {
+		//clear the terminal
+		process.stdout.write('\x1Bc');
+
+		figlet('BREAKING BAD :  HANGMAN', function(err, data) {
+				if (err) {
+						console.log('Something went wrong...');
+						console.dir(err);
+						return;
+				}
+				console.log(chalk.bold.green(data));
+		});
+	};
+
+	this.initial = function() {
+		this.repeat = false;
+		this.invKey = false;
+		this.guesses = 8;
+		var randWord = this.chooseRandomWord();
+		gameWord = new Word(randWord);
+		gameWord.pushLetters();
+	};
+
+	this.guessPrompt = function(_this) {
 	
-		},//close function chooseRandomWord
+		inquirer.prompt([
+			{type: "input",
+				name: "letter",
+				message: "What letter would you like to try?"}
+
+		]).then(function(data){
+			_this.userGuess = data.letter.toLowerCase();
+			if (_this.validKey() && _this.newLetter()) {
+				gameWord.guessedLetters.push(data.letter);
+
+				if (gameWord.letterIsMiss(data.letter)) {
+					_this.guesses--;
+					_this.message = "Miss!";
+				} else {
+					_this.message = "Hit!";
+				}
+
+				if (_this.guesses === 0) {
+					_this.gameOver(false, _this);
+					return;
+				}
+
+				if (gameWord.checkWin()) {
+					_this.gameOver(true, _this);
+					return;
+				} 
+
+				_this.displayGameStatus(_this);
+				setTimeout(function() {
+					_this.guessPrompt(_this);
+				}, 1 * 1000);
+
+			} else {
+				console.log(chalk.bold.red(_this.message));
+				setTimeout(function() {
+					_this.guessPrompt(_this);
+				}, 1 * 1000);
+			}
+		});
+	};
+
+		this.validKey = function() {
+		if ((this.userGuess >= "a") && (this.userGuess <= "z")) {
+			this.message = " ";
+			this.invKey = false;
+			return true;
+		}
+		else {
+			this.message = "Invalid key pressed, try again!";
+			this.invKey = true;
+			return false;
+		}
+	};
+
+	this.newLetter = function() {
+		if (gameWord.guessedLetters.indexOf(this.userGuess) >= 0) {
+			this.message = "You tried that letter already!";
+			this.repeat = true;
+			return false;
+		}
+		else {
+			this.repeat = false;
+			return true;
+		}
+	};
+
+	this.displayGameStatus = function(_this) {
+		this.displayHeader();
+		setTimeout(function() {
+			console.log(chalk.bold.magenta(_this.message));
+			switch (_this.guesses) {
+				case 7: console.log(chalk.bold.green(_this.asciiArt[0]));
+				break;
+				case 6: console.log(chalk.bold.green(_this.asciiArt[1]));
+				break;
+				case 5: console.log(chalk.bold.green(_this.asciiArt[2]));
+				break;
+				case 4: console.log(chalk.bold.yellow(_this.asciiArt[3]));
+				break;
+				case 3: console.log(chalk.bold.yellow(_this.asciiArt[4]));
+				break;
+				case 2: console.log(chalk.bold.yellow(_this.asciiArt[5]));
+				break;
+				case 1: console.log(chalk.bold.red(_this.asciiArt[6]));
+				break;
+				case 0: console.log(chalk.bold.red(_this.asciiArt[7]));
+				break;
+				default: console.log(" ");
+			}
+			console.log(chalk.bold.cyan("Guesses Remaining: " + _this.guesses));
+			console.log(chalk.bold.cyan("Guessed Letters: " + gameWord.guessedLetters));
+			console.log("");
+
+			gameWord.displayWord();
+			console.log("");
+			}, .5 * 1000);
+
+  };
+
+	this.gameOver = function(winner, _this) {
+		_this.message = "";
+
+		this.displayGameStatus(this);
+
+		setTimeout(function() {
+			if (winner) {
+				_this.wins++;
+				figlet('CONGRATS, YOU WON!', function(err, data) {
+						if (err) {
+								console.log('Something went wrong...');
+								console.dir(err);
+								return;
+						}
+						console.log(chalk.bold.bgGreen(data));
+				});
+
+			} else {
+				_this.losses++;
+				figlet('GAME OVER, YOU LOST!', function(err, data) {
+						if (err) {
+								console.log('Something went wrong...');
+								console.dir(err);
+								return;
+						}
+						console.log(chalk.bold.bgRed(data));
+				});
+				
+			}
+
+		}, .5 * 1000);	
+		
+		setTimeout(function() {
+			console.log("");
+			console.log(chalk.bold.yellow("Wins: " + _this.wins));
+			console.log(chalk.bold.yellow("Losses: " + _this.losses));		
+			console.log("");	
+		}, 1 * 1000);
+
+		setTimeout(function() {
+		inquirer.prompt([
+			{type: "confirm",
+				name: "playAgain",
+				default: true,
+				message: "Would you like to play another game of hangman?"}
+			]).then(function(data){
+				if (data.playAgain) _this.startGame();
+			});
+		}, 1.5 * 1000);
+
+
+	} 
+	
+}; // end hangman object constructor
+
+module.exports = Hangman;

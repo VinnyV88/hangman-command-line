@@ -2,7 +2,7 @@
   "name": "hangman-command-line",
   "version": "1.0.0",
   "description": "Command line Hangman game - using Node.js",
-  "main": "Letter.js",
+  "main": "game.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,7 +19,6 @@
   "homepage": "https://github.com/VinnyV88/hangman-command-line#readme",
   "dependencies": {
     "chalk": "^1.1.3",
-    "clear": "0.0.1",
     "figlet": "^1.2.0",
     "inquirer": "^3.0.1"
   }
