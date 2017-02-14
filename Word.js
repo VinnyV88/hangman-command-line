@@ -1,27 +1,27 @@
 //contains all of the methods which will check the letters guessed versus the random word selected
 var Letter = require('./Letter');
 
-function Word(word){
-	this.letters = [];
+function Word(word) {
+  this.letters = [];
   this.word = word;
   this.guessedLetters = [];
 
-  this.pushLetters = function() {
+  this.pushLetters = function () {
 
-  for(var i=0; i < this.word.length; i++) {
-    this.letters.push(new Letter(this.word[i]));
+    for (var i = 0; i < this.word.length; i++) {
+      this.letters.push(new Letter(this.word[i]));
+    };
+
   };
-
-};
-  this.letterIsMiss = function(ltr) {
+  this.letterIsMiss = function (ltr) {
     return (this.word.indexOf(ltr) === -1)
   };
 
 
-  this.displayWord = function() {
+  this.displayWord = function () {
     var maskedString = "";
 
-    for(var i=0; i < this.letters.length; i++) {
+    for (var i = 0; i < this.letters.length; i++) {
       if (this.letters[i].letter === " ") {
         maskedString += "  "
       } else {
@@ -29,18 +29,18 @@ function Word(word){
       }
     };
 
-      console.log(maskedString);
+    console.log(maskedString);
 
   };
 
 
-  this.checkWin = function() {
+  this.checkWin = function () {
     var hits = 0;
 
     for (var i = 0; i < this.word.length; i++) {
       var ltr = this.word[i];
       if (ltr === " ") hits++;
-      else { 
+      else {
         if (this.guessedLetters.indexOf(ltr) >= 0) {
           hits++;
         }
